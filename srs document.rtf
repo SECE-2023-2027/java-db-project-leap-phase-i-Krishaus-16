@@ -1,0 +1,112 @@
+{\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang1033{\fonttbl{\f0\fnil\fcharset0 Cambria Math;}{\f1\fnil\fcharset0 Calibri;}}
+{\*\generator Riched20 10.0.22621}{\*\mmathPr\mmathFont0\mwrapIndent1440 }\viewkind4\uc1 
+\pard\sa200\sl276\slmult1\b\f0\fs28\lang9  Software Requirements Specification (SRS) for Bank Management System\par
+\b0\f1\fs22\par
+\b\fs28 1. Introduction\par
+\b0\fs22 This Software Requirements Specification (SRS) document outlines the functional and non-functional requirements for the Bank Management System (BMS). The system is designed to manage various banking activities such as customer accounts, transactions, loan management, and reporting.\par
+\b\fs28 1.1 Purpose\par
+\b0\fs22 The purpose of the Bank Management System (BMS) is to provide an efficient, secure, and user-friendly software solution for managing the operations of a bank. The system will be used by customers, bank staff (such as tellers and managers), and administrators to perform various banking operations.\par
+\b\fs28 1.2 Scope\par
+\b0\fs22 The system will provide functionalities such as:\par
+- Customer account management (create, update, delete accounts)\par
+- Transaction processing (deposit, withdrawal, transfer)\par
+- Loan management (application, approval, repayment)\par
+- Account balance and transaction history\par
+- Reporting (account statements, transaction reports)\par
+- User authentication and role-based access control\par
+\b\fs28 1.3 Definitions, Acronyms, and Abbreviations\par
+\b0\fs22 - BMS: Bank Management System\par
+- ATM: Automated Teller Machine\par
+- KYC: Know Your Customer (compliance regulations)\par
+- UI: User Interface\par
+- API: Application Programming Interface\par
+- CRUD: Create, Read, Update, Delete (basic database operations)\par
+ \b\fs28 2. Overall Description\b0\fs22\par
+This section provides a high-level description of the system\rquote s components and the interaction between them.\par
+\b\fs28 2.1 System Perspective\b0\fs22\par
+The Bank Management System is a client-server application with the following components:\par
+- Frontend: User Interface (UI) for customers, tellers, and administrators.\par
+- Backend: Business logic, data processing, and database management.\par
+- Database: Stores customer information, transaction details, loan records, etc.\par
+\b\fs28 2.2 User Classes and Characteristics\b0\fs22\par
+ Customer: A registered user who can view and manage their accounts, request loans, and make transactions.\par
+Teller: A bank staff member who performs account transactions, such as deposits and withdrawals, and assists customers.\par
+-Manager: A higher-level bank staff member who has access to account management, loan approvals, and reports.\par
+- Administrator: A system administrator who manages user roles, maintains system settings, and monitors system health.\par
+\b\fs28 2.3 Operating Environment\par
+\b0\fs22 - Frontend: Web-based application or mobile application.\par
+- Backend: A cloud-based or on-premises server with database management systems (e.g., MySQL, PostgreSQL, MongoDB).\par
+- Operating System: Cross-platform (Windows, macOS, Linux).\par
+- Security Protocols: SSL/TLS encryption for secure communication, two-factor authentication, role-based access control.\par
+\b\fs28 2.4 Design and Implementation Constrains\b0\fs22\par
+- The system must support high availability and performance with minimal downtime.\par
+- Data privacy and security are of utmost importance due to financial regulations (e.g., GDPR, PCI DSS).\par
+- The system must be scalable to accommodate future growth in users and transactions.\par
+\b\fs28 2.5 Assumptions and Dependencies\b0\fs22\par
+- The system will be developed using modern web technologies such as HTML5, CSS3, JavaScript, and backend frameworks like Spring Boot or Django.\par
+- The system will rely on third-party payment gateways for processing online transactions.\par
+- The system will be integrated with external identity providers for authentication (e.g., OAuth).\par
+\b\fs28 3. System Features\par
+\b0\fs22 This section defines the core functionalities of the Bank Management System.\par
+\b\fs28 3.1 User Authentication\par
+\b0\fs22 Description: The system will provide secure authentication mechanisms for users (customers, tellers, managers, and administrators).\par
+\b\fs28 Functional Requirements:\par
+\b0\fs22 - Users must log in using a username and password.\par
+- The system will support multi-factor authentication (MFA) for added security.\par
+- Administrators can reset passwords and manage user accounts.\par
+- The system will automatically log users out after a period of inactivity.\par
+\b\fs28 3.2 Customer Account Management\par
+\b0\fs22 Description: Customers will be able to manage their accounts, including creating, updating, and deleting accounts.\par
+\b\fs28 Functional Requirements\b0\fs22 :\par
+- Customers can create a new account by providing personal information, such as name, address, and identification.\par
+- Customers can view and update their account details (address, phone number, etc.).\par
+- Customers can request account closure (subject to approval).\par
+\b\fs28 3.3 Transaction Processing\b0\fs22\par
+Description: Customers can perform various types of transactions, including deposits, withdrawals, and fund transfers.\par
+\b\fs28 Functional Requirements:\par
+\b0\fs22 - Customers can deposit money into their accounts (via bank teller or online).\par
+- Customers can withdraw money from their accounts (via ATM or bank teller).\par
+- Customers can transfer funds between accounts, both within the bank and to external banks.\par
+- Each transaction will be recorded with time, date, and transaction ID.\par
+\b\fs28 3.4 Loan Management\par
+\b0\fs22 Description: The system will allow customers to apply for and manage loans.\par
+\b\fs28 Functional Requirements:\par
+\b0\fs22 - Customers can apply for loans by providing necessary information (loan type, amount, repayment period).\par
+- Loan applications will be reviewed and approved/rejected by bank managers.\par
+- Customers can view their loan status, repayment schedule, and remaining balance.\par
+- The system will calculate monthly loan repayment amounts based on interest rates and the loan amount.\par
+\b\fs28 3.5 Account Statement Generation\par
+\b0\fs22 Description: The system will generate account statements for customers to track their transactions.\par
+\b\fs28 Functional Requirements:\par
+\b0\fs22 - Customers can request monthly or annual account statements.\par
+- The statements will include details of deposits, withdrawals, transfers, and balance.\par
+- Statements will be available in PDF format or downloadable in CSV.\par
+\b\fs28 3.6 Reporting and Analytics\b0\fs22\par
+Description: Managers and administrators can generate reports for auditing and decision-making.\par
+\b\fs28 Functional Requirements\b0\fs22 :\par
+- The system will generate transaction reports (daily, weekly, monthly).\par
+- Loan reports, including total loan amounts, repayments, and defaults.\par
+- User activity and security audit logs.\par
+\b\fs28 3.7 Notifications and Alerts\par
+Description\b0\fs22 : The system will send notifications to users for various activities.\par
+\b\fs28 Functional Requirements\b0\fs22 :\par
+- Customers will receive notifications for successful transactions, loan approvals, and low balances.\par
+- Alerts will be sent for security events, such as failed login attempts or account changes\par
+\b\fs28 4. Non-Functional Requirements\b0\fs22\par
+\b\fs28 4.1 Performance Requirement\b0\fs22\par
+- The system must handle up to 10,000 concurrent users without significant performance degradation.\par
+- Transaction processing should occur in under 2 seconds.\par
+\b\fs28 4.2 Security Requirements\par
+\b0\fs22 - Data must be encrypted both in transit and at rest.\par
+- The system must comply with financial industry security standards (PCI DSS).\par
+- Role-based access control (RBAC) to ensure appropriate permissions are granted based on user roles.\par
+\b\fs28 4.3 Availability\b0\fs22\par
+- The system must have 99.9% uptime, excluding scheduled maintenance.\par
+- The system should have backup and disaster recovery processes in place.\par
+\b\fs28 4.4 Usability\par
+\b0\fs22  The system should have a clean, user-friendly interface with minimal learning curve.\par
+- The UI should be accessible for people with disabilities (e.g., WCAG compliance).\par
+\par
+\par
+}
+ 
