@@ -1,0 +1,560 @@
+{\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang1033{\fonttbl{\f0\fnil\fcharset0 Calibri;}}
+{\*\generator Riched20 10.0.22621}\viewkind4\uc1 
+\pard\sa200\sl276\slmult1\f0\fs28\lang9 package Bankingapplication;\par
+\par
+import java.util.ArrayList;\par
+import java.lang.IllegalArgumentException;\par
+import java.util.List;\par
+\par
+public class BankAccount \{\par
+\tab private String account_number;\par
+\tab private String accountHolderName;\par
+\tab private String accountType;\par
+\tab private double balance;\par
+\tab private String address;\par
+\tab private String contactNumber;\par
+\tab private List<String> transactionHistory;\par
+\tab\par
+\tab public BankAccount(String account_number, String accountHolderName, String accountType, String address, String contactNumber) \{\par
+\tab\tab if(!isValidAccountNumber(account_number)) \{\par
+\tab\tab\tab throw new IllegalArgumentException("Account number must be between 8 and 16 digits");\par
+\tab\tab\}\par
+\tab\tab\par
+\tab\tab this.account_number = account_number;\par
+\tab\tab this.accountHolderName = accountHolderName;\par
+\tab\tab this.accountType = accountType;\par
+\tab\tab this.address = address;\par
+\tab\tab this.balance = 0.0;\par
+\tab\tab this.contactNumber = contactNumber;\par
+\tab\tab this.transactionHistory = new ArrayList<>();\par
+\tab\}\par
+\tab\par
+\tab private boolean isValidAccountNumber(String account_number) \{\par
+\tab\tab return account_number.matches("\\\\d\{8,16\}");\par
+\tab\}\par
+\tab\par
+\tab public String getAccountNumber()\{\par
+\tab\tab return account_number;\par
+\tab\}\par
+\tab\par
+\tab public String getAccountHolderName() \{\par
+\tab\tab return accountHolderName;\par
+\tab\}\par
+\tab\par
+\tab public String getAccountType() \{\par
+\tab\tab return accountType;\par
+\tab\}\par
+\tab\par
+\tab public double getBalance() \{\par
+\tab\tab return balance;\par
+\tab\}\par
+\tab\par
+\tab public void setAddress(String address) \{\par
+\tab\tab this.address = address;\par
+\tab\}\par
+\tab\par
+\tab public void setContactNumber(String contactNumber) \{\par
+\tab\tab this.contactNumber = contactNumber;\par
+\tab\}\par
+\tab\par
+\tab public void deposit(double amount) \{\par
+\tab\tab if(amount > 0) \{\par
+\tab\tab\tab balance += amount;\par
+\tab\tab\tab transactionHistory.add("Deposited: " + amount);\par
+\tab\tab\}\par
+\tab\tab else \{\par
+\tab\tab\tab System.out.println("Invalid deposit amount");\par
+\tab\tab\}\par
+\tab\}\par
+\tab\par
+\tab public void withdraw(double amount) \{\par
+\tab\tab if(amount > 0 && amount <= balance) \{\par
+\tab\tab\tab balance -= amount;\par
+\tab\tab\tab transactionHistory.add("Withdrew: " + amount); \par
+\tab\tab\}\par
+\tab\tab else \{\par
+\tab\tab\tab System.out.println("Insufficient balnce or invalid withdrawal amount");\par
+\tab\tab\}\par
+\tab\}\par
+\tab\par
+\tab public void transfer(BankAccount toAccount, double amount) \{\par
+\tab\tab if(amount > 0 && amount <= balance) \{\par
+\tab\tab\tab this.withdraw(amount);\par
+\tab\tab\tab toAccount.deposit(amount);\par
+\tab\tab\tab transactionHistory.add("Transferred " + amount + " to " + toAccount.getAccountNumber());\par
+\tab\tab\tab toAccount.transactionHistory.add("Recieved " + amount + " from " + this.getAccountNumber());\par
+\tab\tab\}\par
+\tab\tab else \{\par
+\tab\tab\tab System.out.println("Transfer failed. Insufficient balnce or invalid amount");\par
+\tab\tab\}\par
+\tab\}\par
+\tab\par
+\tab public void displayAccountInfo() \{\par
+\tab\tab System.out.println("Account Number : " + account_number);\par
+\tab\tab System.out.println("Account Holder : " + accountHolderName);\par
+\tab\tab System.out.println("Account Type : " + accountType);\par
+\tab\tab System.out.println("Balance : " + balance);\par
+\tab\tab System.out.println("Address : " + address);\par
+\tab\tab System.out.println("Contact Number : " + contactNumber);\par
+\tab\}\par
+\tab\par
+\tab public void displayTransactionHistory() \{\par
+\tab\tab System.out.println("Transaction History for Account: " + account_number);\par
+\tab\tab for(String transaction : transactionHistory) \{\par
+\tab\tab\tab System.out.println(transaction);\par
+\tab\tab\}\par
+\tab\}\par
+\tab\par
+\tab public String getContactNumber() \{\par
+\tab\tab return this.contactNumber;\par
+\tab\}\par
+\tab\par
+\tab public String getAddress() \{\par
+\tab\tab return this.address;\par
+\tab\}\par
+\tab\par
+\tab\par
+\}\par
+CREATE DATABASE banking_app;\par
+\par
+USE banking_app;\par
+\par
+CREATE TABLE accounts(\par
+account_id INT PRIMARY KEY AUTO_INCREMENT,\par
+account_number VARCHAR(20) UNIQUE,\par
+accountHolderName VARCHAR(100),\par
+accountType VARCHAR(10),\par
+balance DOUBLE,\par
+address VARCHAR(255),\par
+contactNumber VARCHAR(20)\par
+);\par
+\par
+select * from accounts;\par
+select * from transactions;\par
+\par
+\par
+CREATE TABLE transactions(\par
+transactionID INT AUTO_INCREMENT PRIMARY KEY,\par
+account_number VARCHAR(20),\par
+accountType VARCHAR(20),\par
+amount DOUBLE,\par
+description VARCHAR(255),\par
+date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\par
+FOREIGN KEY(account_number) REFERENCES accounts(account_number) \par
+);\par
+package Bankingapplication;\par
+\par
+import java.sql.Connection;\par
+import java.sql.PreparedStatement;\par
+import java.sql.SQLException;\par
+import java.util.HashMap;\par
+import java.util.Scanner;\par
+\par
+public class BankingApp \{\par
+\tab private static HashMap<String, BankAccount> accounts = new HashMap<>();\par
+\tab private static Scanner sc = new Scanner(System.in);\par
+\tab\par
+\tab public static void main(String[] args) \{\par
+\tab\tab while(true) \{\par
+\tab\tab\tab System.out.println("\\n---Banking Application---");\par
+\tab\tab\tab System.out.println("1. Create Account");\par
+\tab\tab\tab System.out.println("2. View Account Details");\par
+\tab\tab\tab System.out.println("3. Update Account Information");\par
+\tab\tab\tab System.out.println("4. Deposit");\par
+\tab\tab\tab System.out.println("5. Withdraw");\par
+\tab\tab\tab System.out.println("6. Transfer");\par
+\tab\tab\tab System.out.println("7. View Transaction History");\par
+\tab\tab\tab System.out.println("8. Generate Reports");\par
+\tab\tab\tab System.out.println("9. Exit");\par
+\tab\tab\tab System.out.println("Choose an option");\par
+\tab\tab\tab int choice = sc.nextInt();\par
+\tab\tab\tab sc.nextLine();\par
+\tab\tab\tab\par
+\tab\tab\tab switch(choice) \{\par
+\tab\tab\tab case 1:\par
+\tab\tab\tab\tab createAccount();\par
+\tab\tab\tab\tab break;\par
+\tab\tab\tab case 2:\par
+\tab\tab\tab\tab viewAccountDetails();\par
+\tab\tab\tab     break;\par
+\tab\tab\tab case 3:\par
+\tab\tab\tab\tab updateAccountInfo();\par
+\tab\tab\tab     break;\par
+\tab\tab\tab case 4:\par
+\tab\tab\tab\tab deposit();\par
+\tab\tab\tab\tab break;\par
+\tab\tab\tab case 5:\par
+\tab\tab\tab\tab withdraw();\par
+\tab\tab\tab\tab break;\par
+\tab\tab\tab case 6:\par
+\tab\tab\tab\tab transfer();\par
+\tab\tab\tab\tab break;\par
+\tab\tab\tab case 7: \par
+\tab\tab\tab\tab viewTransactionHistory();\par
+\tab\tab\tab\tab break;\par
+\tab\tab\tab case 8:\par
+\tab\tab\tab\tab generateReports();\par
+\tab\tab\tab\tab break;\par
+\tab\tab\tab case 9:\par
+\tab\tab\tab\tab System.out.println("Thank you for using the Banking Application");\par
+\tab\tab\tab\tab return;\par
+\tab\tab\tab default:\par
+\tab\tab\tab\tab System.out.println("Invalid choice. Please try again");\par
+\tab\tab\tab\}\tab\par
+\tab\tab\}\par
+\tab\}\par
+\tab\par
+\tab public static void createAccount() \{\par
+\tab\tab String account_number;\par
+\tab\tab while(true) \{\par
+\tab\tab\tab System.out.print("Enter the Account Number (8-16 digits): ");\par
+\tab\tab\tab account_number = sc.nextLine().trim();\par
+\tab\tab\tab if(accounts.containsKey(account_number)) \{\par
+\tab\tab\tab\tab System.out.println("Error: Account with this number already exists");\par
+\tab\tab\tab\tab continue;\par
+\tab\tab\tab\}\par
+\tab\tab\tab if(!isValidAccountNumber(account_number)) \{\par
+\tab\tab\tab\tab System.out.println("Error: Account Number must be between 8 and 16 digits");\par
+\tab\tab\tab\}\par
+\tab\tab\tab else \{\par
+\tab\tab\tab\tab break; //valid\par
+\tab\tab\tab\}\par
+\tab\tab\}\par
+\tab\tab\par
+\tab\tab String accountHolderName;\par
+\tab\tab while(true) \{\par
+\tab\tab\tab System.out.print("Enter the Account Holder Name: ");\par
+\tab\tab\tab accountHolderName = sc.nextLine().trim();\par
+\tab\tab\tab if(accountHolderName.isEmpty()) \{\par
+\tab\tab\tab\tab System.out.println("Error: Account Holder Name cannot be empty");\par
+\tab\tab\tab\}\par
+\tab\tab\tab else \{\par
+\tab\tab\tab\tab break;\par
+\tab\tab\tab\}\par
+\tab\tab\}\par
+\tab\tab\par
+\tab\tab String accountType;\par
+\tab\tab while(true) \{\par
+\tab\tab\tab System.out.print("Enter Account Type (S for Savings / C for Current): ");\par
+\tab\tab\tab String accountTypeInput = sc.nextLine().trim().toLowerCase();\par
+\tab\tab\tab if(accountTypeInput.equals("s")) \{\par
+\tab\tab\tab\tab accountType = "Savings";\par
+\tab\tab\tab\tab break;\par
+\tab\tab\tab\}\par
+\tab\tab\tab else if(accountTypeInput.equals("c")) \{\par
+\tab\tab\tab\tab accountType = "Current";\par
+\tab\tab\tab\tab break;\par
+\tab\tab\tab\}\par
+\tab\tab\tab else \{\par
+\tab\tab\tab\tab System.out.println("Error: Invalid Input. Please enter 'S' for Savings or 'C' for Current");\par
+\tab\tab\tab\}\par
+\tab\tab\}\par
+\tab\tab\par
+\tab\tab String address;\par
+\tab\tab while(true) \{\par
+\tab\tab\tab System.out.print("Enter Address: ");\par
+\tab\tab\tab address=sc.nextLine().trim();\par
+\tab\tab\tab if(address.isEmpty()) \{\par
+\tab\tab\tab\tab System.out.println("Error: Address cannot be empty.");\par
+\tab\tab\tab\}\par
+\tab\tab\tab else \{\par
+\tab\tab\tab\tab break;\par
+\tab\tab\tab\}\par
+\tab\tab\}\par
+\tab\tab\par
+\tab\tab String contactNumber;\par
+\tab\tab while(true) \{\par
+\tab\tab\tab System.out.print("Enter the Contact Number (10 digits): ");\par
+\tab\tab\tab contactNumber = sc.nextLine().trim();\par
+\tab\tab\tab if(contactNumber.isEmpty()) \{\par
+\tab\tab\tab\tab System.out.println("Error: Contact Bumber cannot be empty");\par
+\tab\tab\tab\}\par
+\tab\tab\tab else if(!isValidContactNumber(contactNumber))\{\par
+\tab\tab\tab\tab System.out.println("Error: Invalid Contact Number. It must be a 10 digit number");\par
+\tab\tab\tab\}\par
+\tab\tab\tab else \{\par
+\tab\tab\tab\tab break;\par
+\tab\tab\tab\}\par
+\tab\tab\}\par
+\tab\tab try \{\par
+\tab\tab\tab BankAccount newAccount = new BankAccount(account_number, accountHolderName, accountType, address, contactNumber);\par
+\tab\tab\tab accounts.put(account_number, newAccount);\par
+\tab\tab\tab\par
+\tab\tab\tab try(Connection con = DataBaseConnection.getConnection())\{\par
+\tab\tab\tab\tab String sql = "INSERT INTO accounts(account_number, accountHolderName, accountType, balance, address, " + " contactNumber) VALUES(?, ?, ?, ?, ?, ?)";\par
+\tab\tab\tab\tab PreparedStatement stmt = con.prepareStatement(sql);\par
+\tab\tab\tab\tab stmt.setString(1, newAccount.getAccountNumber());\par
+\tab\tab\tab\tab stmt.setString(2, newAccount.getAccountHolderName());\par
+\tab\tab\tab\tab stmt.setString(3, newAccount.getAccountType());\par
+\tab\tab\tab\tab stmt.setDouble(4, newAccount.getBalance());\par
+\tab\tab\tab\tab stmt.setString(5, newAccount.getAddress());\par
+\tab\tab\tab\tab stmt.setString(6, newAccount.getContactNumber());\par
+\tab\tab\tab\tab\par
+\tab\tab\tab\tab int rowsInserted = stmt.executeUpdate();\par
+\tab\tab\tab\tab if(rowsInserted > 0) \{\par
+\tab\tab\tab\tab\tab System.out.println("Account created successfully and saved to database");\par
+\tab\tab\tab\tab\}\par
+\tab\tab\tab\}\par
+\tab\tab\tab catch(SQLException e) \{\par
+\tab\tab\tab\tab e.printStackTrace();\par
+\tab\tab\tab\}\par
+\tab\tab\}\par
+\tab\tab catch(IllegalArgumentException e) \{\par
+\tab\tab\tab System.out.println(e.getMessage());\par
+\tab\tab\}\par
+\tab\}\par
+\tab\par
+\tab private static boolean isValidAccountNumber(String account_number) \{\par
+\tab\tab return account_number.matches("\\\\d\{8,16\}");\par
+\tab\}\par
+\tab\par
+\tab private static boolean isValidContactNumber(String contactNumber) \{\par
+\tab\tab return contactNumber.matches("\\\\d\{10\}");\par
+\tab\}\par
+\tab\par
+\tab private static void viewAccountDetails() \{\par
+\tab\tab System.out.print("Enter the Account Number: ");\par
+\tab\tab String account_number = sc.nextLine();\par
+\tab\tab BankAccount account = accounts.get(account_number);\par
+\tab\tab\par
+\tab\tab if(account != null) \{\par
+\tab\tab\tab account.displayAccountInfo();\par
+\tab\tab\}\par
+\tab\tab else \{\par
+\tab\tab\tab System.out.println("Account not found");\par
+\tab\tab\}\par
+\tab\}\par
+\tab\par
+\tab private static void updateAccountInfo() \{\par
+\tab\tab System.out.print("Enter the Account Number: ");\par
+\tab\tab String account_number = sc.nextLine();\par
+\tab\tab BankAccount account = accounts.get(account_number);\par
+\tab\tab\par
+\tab\tab if(account != null) \{\par
+\tab\tab\tab System.out.print("Enter the new Address: ");\par
+\tab\tab\tab String address = sc.nextLine();\par
+\tab\tab\tab System.out.print("Enter the new Contact Number: ");\par
+\tab\tab\tab String contactNumber = sc.nextLine();\par
+\tab\tab\tab\par
+\tab\tab\tab account.setAddress(address);\par
+\tab\tab\tab account.setContactNumber(contactNumber);\par
+\tab\tab\tab\par
+\tab\tab\tab try(Connection con = DataBaseConnection.getConnection())\{\par
+\tab\tab\tab\tab String sql = "UPDATE accounts SET address = ?, contactNumber = ? WHERE account_number = ?";\par
+\tab\tab\tab\tab PreparedStatement stmt = con.prepareStatement(sql);\par
+\tab\tab\tab\tab stmt.setString(1,  address);\par
+\tab\tab\tab\tab stmt.setString(2,  contactNumber);\par
+\tab\tab\tab\tab stmt.setString(3,  account_number);\par
+\tab\tab\tab\tab\par
+\tab\tab\tab\tab int rowsUpdated = stmt.executeUpdate();\par
+\tab\tab\tab\tab if(rowsUpdated > 0) \{\par
+\tab\tab\tab\tab\tab System.out.println("Account Information updated successfully in database");\par
+\tab\tab\tab\tab\}\par
+\tab\tab\tab\tab else \{\par
+\tab\tab\tab\tab\tab System.out.println("Failed to update account information in database");\par
+\tab\tab\tab\tab\}\par
+\tab\tab\tab\}\par
+\tab\tab\tab catch(SQLException e) \{\par
+\tab\tab\tab\tab e.printStackTrace();\par
+\tab\tab\tab\}\par
+\tab\tab\}\par
+\tab\tab else \{\par
+\tab\tab\tab System.out.println("Account not found");\par
+\tab\tab\}\par
+\tab\}\par
+\tab\par
+\tab private static void deposit() \{\par
+\tab\tab System.out.print("Enter Account Number: ");\par
+\tab\tab String accountNumber=sc.nextLine();\par
+\tab\tab BankAccount account =accounts.get(accountNumber);\par
+\tab\tab\par
+\tab\tab if(account!=null) \{\par
+\tab\tab\tab System.out.print("Enter amount to deposit: ");\par
+\tab\tab\tab double amount = sc.nextDouble();\par
+\tab\tab\tab account.deposit(amount);\par
+\tab\tab\tab\par
+\tab\tab\tab try(Connection con = DataBaseConnection.getConnection())\{\par
+\tab\tab\tab\tab String sql="UPDATE accounts SET balance = ? WHERE account_number = ?";\par
+\tab\tab\tab\tab PreparedStatement stmt=con.prepareStatement(sql);\par
+\tab\tab\tab\tab stmt.setDouble(1, account.getBalance());\par
+\tab\tab\tab\tab stmt.setString(2, account.getAccountNumber());\par
+\tab\tab\tab\tab stmt.executeUpdate();\par
+\tab\tab\tab\tab\par
+\tab\tab\tab\tab //insert transaction record \par
+\tab\tab\tab\tab sql="INSERT INTO transactions (account_number, accountType, amount) VALUES (?,'Deposit',?)";\par
+\tab\tab\tab\tab stmt=con.prepareStatement(sql);\par
+\tab\tab\tab\tab stmt.setString(1, accountNumber);\par
+\tab\tab\tab\tab stmt.setDouble(2, amount);\par
+\tab\tab\tab\tab stmt.executeUpdate();\par
+\tab\tab\tab\tab\par
+\tab\tab\tab\tab System.out.println("Deposit successful and recorded in database.");\par
+\tab\tab\tab\tab System.out.println("Current Balance: "+ account.getBalance()); //display current balance\par
+\tab\tab\tab\}\par
+\tab\tab\tab catch(SQLException e) \{\par
+\tab\tab\tab\tab e.printStackTrace();\par
+\tab\tab\tab\}\par
+\tab\tab\}\par
+\tab\tab else \{\par
+\tab\tab\tab System.out.println("Account not found.");\par
+\tab\tab\}\par
+\tab\}\par
+\tab\par
+\tab private static void withdraw() \{\par
+\tab\tab System.out.print("Enter the Account Number: ");\par
+\tab\tab String account_number = sc.nextLine();\par
+\tab\tab BankAccount account = accounts.get(account_number);\par
+\tab\tab\par
+\tab\tab if(account != null) \{\par
+\tab\tab\tab System.out.print("Enter the amount to be withdraw: ");\par
+\tab\tab\tab double amount = sc.nextDouble();\par
+\tab\tab\tab\par
+\tab\tab\tab if(amount > 0 && amount <= account.getBalance()) \{\par
+\tab\tab\tab\tab account.withdraw(amount);\par
+\tab\tab\tab\tab\par
+\tab\tab\tab\tab try(Connection con = DataBaseConnection.getConnection()) \{\par
+\tab\tab\tab\tab\tab String sql = "UPDATE accounts SET balance = ? WHERE account_number = ?";\par
+\tab\tab\tab\tab\tab PreparedStatement stmt = con.prepareStatement(sql);\par
+\tab\tab\tab\tab\tab stmt.setDouble(1,  account.getBalance());\par
+\tab\tab\tab\tab\tab stmt.setString(2, account.getAccountNumber());\par
+\tab\tab\tab\tab\tab stmt.executeUpdate();\par
+\tab\tab\tab\tab\tab\par
+\tab\tab\tab\tab\tab sql="INSERT INTO transactions(account_number,accountType,amount) VALUES (?,'Withdrawal',?)";\par
+\tab\tab\tab\tab\tab stmt=con.prepareStatement(sql);\par
+\tab\tab\tab\tab\tab stmt.setString(1, account_number);\par
+\tab\tab\tab\tab\tab stmt.setDouble(2, amount);\par
+\tab\tab\tab\tab\tab stmt.executeUpdate();\par
+\tab\tab\tab\tab\tab\par
+\tab\tab\tab\tab\tab System.out.println("Withdraw successful and recorded in the database");\par
+\tab\tab\tab\tab\tab System.out.println("Current Balance: " + account.getBalance());\par
+\tab\tab\tab\tab\}\par
+\tab\tab\tab\tab catch(SQLException e) \{\par
+\tab\tab\tab\tab\tab e.printStackTrace();\par
+\tab\tab\tab\tab\}\par
+\tab\tab\tab\}\par
+\tab\tab\tab else \{\par
+\tab\tab\tab\tab System.out.println("Insufficient balance or Invalid withdrawal amount");\par
+\tab\tab\tab\}\par
+\tab\tab\}\par
+\tab\tab else \{\par
+\tab\tab\tab System.out.println("Account not found");\par
+\tab\tab\}\par
+\tab\}\par
+\tab\par
+\tab private static void transfer() \{\par
+\tab\tab System.out.print("Enter your Account Number: ");\par
+\tab\tab String fromaccount_number = sc.nextLine();\par
+\tab\tab System.out.print("Enter the recipient Account Number: ");\par
+\tab\tab String toaccount_number = sc.nextLine();\par
+\tab\tab System.out.print("Enter the amount to be transferred: ");\par
+\tab\tab double amount = sc.nextDouble();\par
+\tab\tab\par
+\tab\tab BankAccount fromAccount = accounts.get(fromaccount_number);\par
+\tab\tab BankAccount toAccount = accounts.get(toaccount_number);\par
+\tab\tab\par
+\tab\tab if(fromAccount != null && toAccount != null) \{\par
+\tab\tab\tab if(amount > 0 && amount <= fromAccount.getBalance()) \{\par
+\tab\tab\tab\tab fromAccount.withdraw(amount);\par
+\tab\tab\tab\tab toAccount.deposit(amount);\par
+\tab\tab\tab\tab\par
+\tab\tab\tab\tab try(Connection con = DataBaseConnection.getConnection())\{\par
+\tab\tab\tab\tab\tab con.setAutoCommit(false);\par
+\tab\tab\tab\tab\tab\par
+\tab\tab\tab\tab\tab String sql = "UPDATE accounts SET balance = ? WHERE account_number = ?";\par
+\tab\tab\tab\tab\tab PreparedStatement stmt = con.prepareStatement(sql);\par
+\tab\tab\tab\tab\tab stmt.setDouble(1, fromAccount.getBalance());\par
+\tab\tab\tab\tab\tab stmt.setString(2, fromAccount.getAccountNumber());\par
+\tab\tab\tab\tab\tab stmt.executeUpdate();\par
+\tab\tab\tab\tab\tab\par
+\tab\tab\tab\tab\tab stmt.setDouble(1, toAccount.getBalance());\par
+\tab\tab\tab\tab\tab stmt.setString(2, toAccount.getAccountNumber());\par
+\tab\tab\tab\tab\tab stmt.executeUpdate();\par
+\tab\tab\tab\tab\tab\par
+\tab\tab\tab\tab\tab sql = "INSERT INTO transactions(account_number, accountType, amount, description) VALUES (?, " + " 'Transfer Out', ?, ?)";\par
+\tab\tab\tab\tab\tab stmt = con.prepareStatement(sql);\par
+\tab\tab\tab\tab\tab stmt.setString(1, fromaccount_number);\par
+\tab\tab\tab\tab\tab stmt.setDouble(2, amount);\par
+\tab\tab\tab\tab\tab stmt.setString(3, "Transferred to " + toaccount_number);\par
+\tab\tab\tab\tab\tab stmt.executeUpdate();\par
+\tab\tab\tab\tab\tab\par
+\tab\tab\tab\tab\tab sql = "INSERT INTO transactions(account_number, accountType, amount, description) VALUES (?, 'Transfer In', ?, ?)";\par
+\tab\tab\tab\tab\tab stmt = con.prepareStatement(sql);\par
+\tab\tab\tab\tab\tab stmt.setString(1, toaccount_number);\par
+\tab\tab\tab\tab\tab stmt.setDouble(2, amount);\par
+\tab\tab\tab\tab\tab stmt.setString(3, "Recieved from " + fromaccount_number);\par
+\tab\tab\tab\tab\tab stmt.executeUpdate();\par
+\tab\tab\tab\tab\tab\par
+\tab\tab\tab\tab\tab con.commit();\par
+\tab\tab\tab\tab\tab System.out.println("Amount transferred successfully and recorded in the datbase");\par
+\tab\tab\tab\tab\}\par
+\tab\tab\tab\tab catch(SQLException e) \{\par
+\tab\tab\tab\tab\tab e.printStackTrace();\par
+\tab\tab\tab\tab\}\par
+\tab\tab\tab\}\par
+\tab\tab\tab else \{\par
+\tab\tab\tab\tab System.out.println("Transfer failed. Insufficient balance or invalid amount");\par
+\tab\tab\tab\}\par
+\tab\tab\}\par
+\tab\tab else \{\par
+\tab\tab\tab System.out.println("One or both the accounts can not be found");\par
+\tab\tab\}\par
+\tab\}\par
+\tab\par
+\tab private static void viewTransactionHistory() \{\par
+\tab\tab System.out.print("Enter Account Number: ");\par
+\tab\tab String account_number = sc.nextLine();\par
+\tab\tab BankAccount account = accounts.get(account_number);\par
+\tab\tab\par
+\tab\tab if(account != null) \{\par
+\tab\tab\tab account.displayTransactionHistory();\par
+\tab\tab\}\par
+\tab\tab else \{\par
+\tab\tab\tab System.out.println("Account not found");\par
+\tab\tab\}\par
+\tab\}\par
+\tab\par
+\tab private static void generateReports() \{\par
+\tab\tab System.out.println("\\n--- Report Generation ---");\par
+\tab\tab System.out.println("1. Customer Details");\par
+\tab\tab System.out.println("2. Total Balance");\par
+\tab\tab System.out.println("3. Number of Accounts by Type");\par
+\tab\tab System.out.println("Choose an option");\par
+\tab\tab int choice = sc.nextInt();\par
+\tab\tab\par
+\tab\tab switch(choice) \{\par
+\tab\tab case 1:\par
+\tab\tab\tab generateCustomerDetailsReport();\par
+\tab\tab\tab break;\par
+\tab\tab case 2:\par
+\tab\tab\tab generateTotalBalanceReport();\par
+\tab\tab\tab break;\par
+\tab\tab case 3:\par
+\tab\tab\tab generateAccountTypeReport();\par
+\tab\tab\tab break;\par
+\tab\tab default:\par
+\tab\tab\tab System.out.println("Invalid choice. Please try again");\par
+\tab\tab\}\par
+\tab\}\par
+\tab\par
+\tab public static void generateCustomerDetailsReport() \{\par
+\tab\tab System.out.println("\\nCustomer Details Report: ");\par
+\tab\tab for(BankAccount account : accounts.values()) \{\par
+\tab\tab\tab account.displayAccountInfo();\par
+\tab\tab\tab System.out.println("--------------------------------");\par
+\tab\tab\}\par
+\tab\}\par
+\tab\par
+\tab private static void generateTotalBalanceReport() \{\par
+\tab\tab double totalBalance = accounts.values().stream().mapToDouble(BankAccount::getBalance).sum();\par
+\tab\tab System.out.println("Total balance across all accounts: " + totalBalance);\par
+\tab\}\par
+\tab\par
+\tab private static void generateAccountTypeReport() \{\par
+\tab\tab long savingsCount = accounts.values().stream().filter(acc -> acc.getAccountType().equalsIgnoreCase("Savings")).count(); \par
+        long currentCount = accounts.values().stream().filter(acc -> acc.getAccountType().equalsIgnoreCase("Current")).count();\par
+\tab\tab System.out.println("Number of Savings Accounts: " + savingsCount);\par
+\tab\tab System.out.println("Number of Current Accounts: " + currentCount);\par
+\tab\}\par
+\tab\par
+\}\par
+}
+ 
